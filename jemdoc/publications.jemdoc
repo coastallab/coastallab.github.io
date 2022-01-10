@@ -1,0 +1,66 @@
+# jemdoc: menu{MENU}{index.html}
+# jemdoc: title{Research Outputs}
+= Research Outputs
+[http://coastal.korea.ac.kr  Coastal Hydrodynamics Lab.  \@ Korea University]
+
+~~~
+{}{img_left}{journals.png}{alt text}{805}{180}{}
+~~~
+
+\n
+
+Please refer to [http://scholar.google.co.kr/citations?user=xN_240kAAAAJ&hl=en Google Scholar] for an overview of my publications.
+
+== Journal Publications 
+. [http://www.sciencedirect.com/science/article/pii/S1463500311000424 Modeling Scour and Deposition in Harbors Due to Complex Tsunami-Induced Currents] \n 
+  Son, S., Lynett, P. , /in review/
+. [http://http://www.jcronline.org/loi/coas Finite Element Solution of Linear Waves on a Sloping Bottom Boundary] \n
+  Jung, T.-H, Son, S., Ryu, Y. ,--  /Journal of Coastal Reasearch/, /in press/
+. [http://www.jcronline.org/page/special_publications Investigation of Wave Breaking Turbulence in Morphodynamic Modelling] \n 
+  Yoon, H.-D., Cho, M., Son, S.-Y. --  /Journal of Coastal Reasearch/, SI75: 924--946. March, 2016.
+. [http://www.jcronline.org/page/special_publications Investigation of Vertical Structure of Rip-currents in the Nearshore Circulation] \n 
+  Son, S., Jung, T.-H., Shi, F. --  /Journal of Coastal Reasearch/, SI75: 1402--1406. March, 2016.
+. [http://www.jcronline.org/page/special_publications A Comprehensive Sensitivity Analysis of Tsunami Model System to the Parametric and Input Uncertainties] \n 
+  Jung, T.-H., Son, S., Lynett, P. --  /Journal of Coastal Reasearch/, SI75: 1117--1121. March, 2016.
+. [http://dx.doi.org/10.1016/j.coastaleng.2014.04.009 Interaction of Weakly Dispersive Water Waves with Sheared Currents of Arbitrary Profile] \n 
+  Son, S., Lynett, P. --  /Coastal Engineering/, 90: 64--48. August, 2014.
+. [http://dx.doi.org/10.1017/jfm.2014.144 Nonlinear and Dispersive Free Surface Waves Propagating over Fluids with Weak Vertical and Horizontal Density Variation] \n 
+ Son, S., Lynett, P. -- /Journal of Fluid Mechanics/, 748: 221-240., June, 2014. 
+. [http://dx.doi.org/10.1002/2013GL058680 Assessment of Tsunami-Induced Current Hazard] \n 
+ Lynett, P., Borrero, J., Son, S., Wilson, R., Miller, K. -- /Geophysical Research Letters/, 41: 2048-2055, March, 2014.
+. [http://dx.doi.org/10.1007/s00024-012-0568-3 Coastal Impacts of the Marth 11th Tohoku, Japan Tsunami in the Galapagos Islands] \n 
+ Lynett, P., Weiss, R., Renteria, W., Morales, G., Son, S., Arcos, M., and Maclnnes, B. -- /Pure and Applied Geophysics/, 170(6-8): 1189-1206, June, 2013.
+. [http://dx.doi.org/10.1016/j.epsl.2012.02.002 Observations and Modeling of Tsunami-Induced Currents in Ports and Harbors] \n 
+ Lynett, P., Borrero, J., Weiss, R., Son, S., Greer, D. and Renteria, W. -- /Earth and Planetary Science Letters/, 327-328: 68-74. April, 2012.
+. [http://dx.doi.org/10.1016/j.ocemod.2011.02.007 Nested and Multi-physics Modeling of Tsunami Evolution from Generation to Inundation] \n 
+	Son, S., Lynett, P. and Kim, D.-H. --- /Ocean Modelling/, 38(1-2): 96--113. March, 2011.
+. [http://www.sciencedirect.com/science/article/pii/S1463500311000424 Performance Comparison of Spectral Wave Models Based on Different Governing Equations Including Wave Breaking] \n 
+ Oh, S.-H., Suh, K.-D., Son, S.-Y. and Lee, D.-Y. -- /KSCE Journal of Civil Engineering/, 13(2): 75-84. March, 2009.
+
+== Dissertation
+. [http://cee.usc.edu/assets/025/85789.pdf Wave induced hydrodynamic complexity and transport in the nearshore] \n 
+  Son, S. -- Ph.D. Dissertation, [http://www.usc.edu University of Southern California], August, 2012.
+
+
+== Conference Proceedings
+. [https://www.onepetro.org/conference-paper/ISOPE-I-15-249 Coastal Geomorphology Model Using Boussinesq Equation Considering Undertow Effect] \n
+  Kim, D.-H., Son, S., The Twenty-fifth International Offshore and Polar Engineering Conference, Kona, Hawaii, USA, June, 2015.
+. [http://adsabs.harvard.edu/abs/2014AGUFMEP22A..08S Numerical Prediction of Tsunami-Induced Sediment Transport in the Harbor] \n
+  Son, S., Lynett, P., AGU(American Geophysical Union) Fall Meeting, San Fransico, CA, USA, December, 2014.
+. [https://icce-ojs-tamu.tdl.org/icce/index.php/icce/article/view/7333 Numerical Study of Morphological Changes by Far-Field Tsunami Impacts] \n
+  Son, S., Lynett, P. , 34th International Conference on Coastal Engineering, Seoul, Korea, June, 2014. 
+. [http://adsabs.harvard.edu/abs/2013AGUFMNH54A..01L Assessment of Nearshore Hazard due to Tsunami-Induced Currents (invited)] \n
+  Lynett, P., Borrero, J., Son, S., Wilson, R., Miller, K., AGU(American Geophysical Union) Fall Meeting, San Fransico, CA, USA, December, 2013.
+. [http://tsunami2013.org/ Assessment of Near Shore Hazard due to Tsunami-Induced Currents] \n
+  Lynett, P., Borrero, J., Son, S., Wilson, R., Miller, K., 26th International Tsunami Symposium, G\:{o}cek, Turkey, September, 2013.
+. [http://repository.unhas.ac.id/handle/123456789/7568 Inclined Bottom Boundary Condition for the Mild-slope Equation] \n
+  Jung, T.-H., Son, M., Son, S., Park, H.-S., The 7th International Conference on Asian and Pacific Coasts, Bali, Indonesia, September, 2013.
+. [http://ascelibrary.org/doi/abs/10.1061/9780784413067.057 Detailed Simulation of Tsunami-Induced Currents in California Ports and Harbors] \n 
+  Lynett, P., Borrero, J., Wilson, R., Miller, K., Son, S., Port 2013, Seattle, WA, USA, August, 2013.
+. [http://www.jsce.or.jp/committee/ocean/coastalstructures  Simulation of tsunami-induced currents in ports and harbors]\n
+  Lynett, P., Son, S., Kim, D., Coastal Structures, Yokohama, Japan, September, 2011. 
+. [https://journals.tdl.org/icce/article/view/1385 Experimental Study of Solitary Wave Evolution over a 3D Shallow Shelf] \n
+  Lynett, P., Swigler, D.,Son, S., Bryant, D., Socolofsky, S., 32nd International Conference on Coastal Engineering, Shanghi, China, June, 2010. 
+. [http://scholar.google.co.kr/scholar?hl=en&as_sdt=0,5&cluster=4702491239747120740 Calculation of Wave Reflection and Transmission from Permeable Wave Barriers] \n
+  Suh, K.-D., Son, S., Lee, J.-I., Lee, T.-H., 28th International Conference on Coastal Engineering, Cardiff, UK, June, 2002. 
+  
