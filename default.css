@@ -256,11 +256,10 @@ h3 {
   border-bottom: none;
 }
 
-pp {
-	margin-top: 0.0em;
-	margin-bottom: 0.8em;
-	padding: 0;
-	line-height: 1.3;
+ph {
+  padding-top: 0.8em;
+  font-size: 200%;
+  font-family:verdana;
 }
 
 div#footer {
