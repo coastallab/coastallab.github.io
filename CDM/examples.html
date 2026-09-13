@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Chapter 2 widgets ? index · ACEE348</title>
+<title>Worked Examples 1 & 2 · ACEE348</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -64,5 +64,29 @@ input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;bac
 .legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12px}
 .legend span{display:inline-flex;align-items:center;gap:6px}.legend .sw{width:14px;height:3px;border-radius:2px;display:inline-block}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
-</style></head><body><div class="page"><div class="cap"><span class="dotc"></span>ACEE348 Ch.2 · <b>Interactive widgets ? index</b></div><div class="area" style="overflow:auto"><div class="card"><p style="margin:0 0 12px">Eight standalone pages, one per slide. Open each to test; link or embed one per slide. On GitHub Pages each is reachable at <code>https://coastallab.github.io/CDM/index.html</code>.</p><table style="width:100%;border-collapse:collapse;font-size:14px"><thead><tr><th style="text-align:left;padding:8px;border-bottom:2px solid var(--line)">Page</th><th style="text-align:left;padding:8px;border-bottom:2px solid var(--line)">Insert after</th><th style="text-align:left;padding:8px;border-bottom:2px solid var(--line)">Original slide</th></tr></thead><tbody><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="spring.html">spring.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 3</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Basic forcing mechanism (spring analogy)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="spectrum.html">spectrum.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 4</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Classification of waves (period spectrum)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="superposition.html">superposition.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 8</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Regular vs irregular waves (Goda)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="dispersion.html">dispersion.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 18</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Dispersion Relationship (+ particle orbits)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="regime.html">regime.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 20</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Wave Classification (deep/intermediate/shallow)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="examples.html">examples.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slides 21?22</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Example 1 & 2</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="profiles.html">profiles.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 27</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Wave Kinematics / Pressure (vertical structure)</td></tr><tr><td style='padding:8px;border-bottom:1px solid var(--line)'><a href="energy.html">energy.html</a></td><td style='padding:8px;border-bottom:1px solid var(--line)'>Slide 33</td><td style='padding:8px;border-bottom:1px solid var(--line)'>Wave Energy & Power</td></tr></tbody></table></div></div></div>
-<script></script></body></html>
+</style></head><body><div class="page">
+<div class="cap"><span class="dotc"></span>ACEE348 Ch.2 · <b>Examples 1 &amp; 2 — one wave (T=10 s), two depths</b></div>
+<div class="area"><div class="exgrid">
+ <div class="excard"><div class="tag">Example 1 — offshore (H = 2 m)</div>
+  <div class="ctrl" style="margin-top:12px"><div class="ctrl-top"><label>depth d</label><span class="val"><span id="e1v">100</span> m</span></div><input type="range" id="e1" min="5" max="150" step="1" value="100"></div>
+  <div class="exout" id="e1o"></div></div>
+ <div class="excard"><div class="tag">Example 2 — nearshore</div>
+  <div class="ctrl" style="margin-top:12px"><div class="ctrl-top"><label>depth d</label><span class="val"><span id="e2v">2.3</span> m</span></div><input type="range" id="e2" min="1" max="30" step="0.1" value="2.3"></div>
+  <div class="exout" id="e2o"></div></div>
+</div></div></div>
+<script>
+const g=9.81,rho=1025;
+function solveK(sig,d){let k=sig*sig/g;for(let i=0;i<200;i++){const tk=Math.tanh(k*d);const f=g*k*tk-sig*sig;const df=g*tk+g*k*d*(1-tk*tk);let kn=k-f/df;if(!isFinite(kn)||kn<=0)kn=sig*sig/(g*Math.max(tk,1e-9));if(Math.abs(kn-k)<1e-12){k=kn;break;}k=kn;}return k;}
+function waveProps(T,d){const sig=2*Math.PI/T,k=solveK(sig,d),L=2*Math.PI/k,C=sig/k,kd=k*d;let n;if(2*kd>700)n=0.5;else n=0.5*(1+2*kd/Math.sinh(2*kd));const Cg=n*C,dL=d/L;let reg='Intermediate water';if(dL>=0.5)reg='Deep water';else if(dL<=0.05)reg='Shallow water';return{sig,k,L,C,Cg,n,kd,dL,reg};}
+const fx=(x,d)=>x.toFixed(d);
+function setFill(el){if(!el)return;const mn=+el.min,mx=+el.max,v=+el.value;el.style.setProperty('--fill',((v-mn)/(mx-mn)*100)+'%');}
+function fitCanvas(cv){const dpr=Math.min(window.devicePixelRatio||1,2);const w=cv.clientWidth,h=cv.clientHeight;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return[c,w,h];}
+const REDUCE=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+function ex1(){const el=document.getElementById('e1'),d=+el.value;document.getElementById('e1v').textContent=d;const T=10,H=2,p=waveProps(T,d),L0=g*T*T/(2*Math.PI),C0=g*T/(2*Math.PI),ok=p.dL>0.5;
+ document.getElementById('e1o').innerHTML='full: L=<b>'+fx(p.L,1)+'</b> m, C=<b>'+fx(p.C,2)+'</b> m/s, d/L=<b>'+fx(p.dL,3)+'</b><br>deep approx: L₀=gT²/2π=<b>'+fx(L0,1)+'</b> m, C₀=<b>'+fx(C0,2)+'</b> m/s<br>steepness H/L=<b>'+fx(H/p.L,4)+'</b><br><span class="reg">'+p.reg+(ok?' → deep approx valid':' → deep approx NOT valid')+'</span>';}
+function ex2(){const el=document.getElementById('e2'),d=+el.value;document.getElementById('e2v').textContent=fx(d,1);const T=10,p=waveProps(T,d),Cs=Math.sqrt(g*d),Ls=Cs*T,ok=p.dL<0.05;
+ document.getElementById('e2o').innerHTML='full: L=<b>'+fx(p.L,1)+'</b> m, C=<b>'+fx(p.C,2)+'</b> m/s, d/L=<b>'+fx(p.dL,3)+'</b><br>shallow approx: C=√(gd)=<b>'+fx(Cs,2)+'</b> m/s, L=CT=<b>'+fx(Ls,1)+'</b> m<br><span class="reg">'+p.reg+(ok?' → shallow approx valid (d/L<0.05)':' → not yet shallow (d/L≥0.05)')+'</span>';}
+window.addEventListener('load',()=>{const a=document.getElementById('e1'),b=document.getElementById('e2');setFill(a);setFill(b);
+ a.addEventListener('input',()=>{setFill(a);ex1();});b.addEventListener('input',()=>{setFill(b);ex2();});ex1();ex2();});
+</script></body></html>
