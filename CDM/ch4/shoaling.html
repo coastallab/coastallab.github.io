@@ -1,0 +1,187 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wave shoaling · ACEE348</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3F8F8;--ink:#0C232E;--muted:#5A6B72;--deep:#0A2A3A;--deep2:#0F4152;
+--foam:#43D0C7;--buoy:#F2A93B;--sand:#C9A66B;--coral:#E8663C;--line:#CBD8DA;--card:#FFFFFF;}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:16px;-webkit-font-smoothing:antialiased}
+.page{height:100%;display:flex;flex-direction:column;padding:14px 16px;gap:10px;overflow:hidden}
+.cap{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);flex:0 0 auto;display:flex;align-items:center;gap:8px}
+.cap b{color:var(--deep2)}.cap .dotc{width:7px;height:7px;border-radius:50%;background:var(--coral);display:inline-block}
+.area{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.stage{flex:1 1 auto;min-height:0;background:var(--deep);border-radius:14px;overflow:hidden;position:relative;box-shadow:0 14px 34px -24px rgba(10,42,58,.6)}
+canvas{display:block;width:100%;height:100%}
+.stage-cap{position:absolute;left:12px;bottom:9px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(234,240,241,.55);pointer-events:none}
+.playbtn{position:absolute;top:10px;right:10px;z-index:3;border:0;cursor:pointer;background:rgba(234,240,241,.14);color:#EAF0F1;font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 11px;border-radius:8px;backdrop-filter:blur(4px)}
+.playbtn:hover{background:rgba(234,240,241,.24)}
+.row{display:flex;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.controls{flex:1 1 320px}.readout{flex:1 1 300px}
+h4{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.ctrls3{display:flex;gap:16px;flex-wrap:wrap}
+.ctrl{flex:1 1 150px;min-width:130px}
+.ctrl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.ctrl-top label{font-weight:600;font-size:14px}
+.ctrl-top .val{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--deep2);font-size:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:4px;background:linear-gradient(90deg,var(--foam) 0%,var(--foam) var(--fill,50%),#DBE4E5 var(--fill,50%));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--card);border:3px solid var(--buoy);cursor:pointer;box-shadow:0 2px 6px rgba(12,35,46,.25)}
+input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--card);border:3px solid var(--buoy);cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.stat{border-left:2px solid var(--line);padding-left:11px}
+.stat .k{font-size:11px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;line-height:1.15}
+.stat .v small{font-size:12px;color:var(--muted);font-weight:400}
+.badge{margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;padding:6px 13px;border-radius:20px;background:#EAF6F5;color:var(--deep2);font-family:"IBM Plex Mono",monospace}
+.badge .dot{width:9px;height:9px;border-radius:50%;background:var(--buoy)}
+.subst{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--deep2);background:#EDF5F5;border:1px dashed var(--line);border-radius:10px;padding:9px 12px;text-align:center;line-height:1.8;flex:0 0 auto}
+.subst b{color:var(--buoy)}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.spectrum{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line);flex:0 0 auto}
+.band{flex:1;padding:16px 9px;cursor:pointer;text-align:center;border-right:1px solid rgba(255,255,255,.5);transition:flex .25s,background .2s;color:#fff;min-width:0}
+.band:last-child{border-right:0}.band .bt{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:14px}
+.band .bp{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.85;margin-top:3px}
+.band.active{flex:2.4}
+.band-detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:15px;flex:1 1 auto;min-height:0;overflow:auto}
+.scalebar{position:relative;height:58px;margin:32px 8px 10px}
+.scalebar .track{position:absolute;top:26px;left:0;right:0;height:8px;border-radius:5px;background:linear-gradient(90deg,#8FD0C9,#2E9BB0,#0F4152)}
+.tick{position:absolute;top:16px;width:1px;height:28px;background:var(--muted)}
+.tick .lab{position:absolute;top:30px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.zone{position:absolute;top:-16px;font-size:12px;font-weight:600;color:var(--muted);transform:translateX(-50%);font-family:"Space Grotesk",sans-serif}
+.ptr{position:absolute;top:8px;transform:translateX(-50%);transition:left .12s ease}
+.ptr .pin{width:2px;height:44px;background:var(--buoy);margin:0 auto}
+.ptr .cap2{position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--buoy)}
+.exgrid{display:flex;gap:14px;flex:1 1 auto;min-height:0}
+.excard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;flex:1;display:flex;flex-direction:column}
+.excard .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);font-weight:600}
+.exout{margin-top:10px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.9;color:var(--deep2)}
+.exout b{color:var(--buoy)}.exout .reg{color:var(--coral);font-weight:600}
+.ebar{display:flex;height:34px;border-radius:8px;overflow:hidden;margin:10px 0 4px;border:1px solid var(--line)}
+.ebar .ep{background:#7FC9C2}.ebar .ek{background:#3E9BB0}
+.ebar div{display:flex;align-items:center;justify-content:center;color:#04222b;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend .sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:1px solid var(--line);background:#EDF5F5;color:var(--deep2);font-family:"IBM Plex Mono",monospace;font-size:12px;
+ padding:6px 11px;border-radius:8px;cursor:pointer}
+.btn:hover{background:#DFF0EF}.btn.on{background:var(--deep2);color:#fff;border-color:var(--deep2)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:#fff;font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 11px;cursor:pointer;color:var(--deep2)}
+.seg button.on{background:var(--deep2);color:#fff}
+.stage2{display:flex;gap:10px;flex:1 1 auto;min-height:0}
+.stage2 .stage{flex:1 1 0}
+.mini{flex:0 0 34%;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.mini canvas{display:block;width:100%;height:100%}
+.legend2{position:absolute;right:10px;bottom:9px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(234,240,241,.75);display:flex;align-items:center;gap:6px;pointer-events:none}
+.legend2 .bar{width:110px;height:8px;border-radius:4px}
+.warn{color:var(--coral);font-weight:600}
+@media (max-width:760px){.stage2{flex-direction:column}.mini{flex:0 0 220px}.page{overflow:auto;height:auto}html,body{height:auto}.stage{min-height:300px}}
+</style></head><body><div class="page">
+<div class="cap"><span class="dotc"></span>ACEE348 Ch.4 · <b>Wave shoaling — energy flux ECn is conserved, so H changes as Cg changes</b></div>
+
+<div class="area">
+ <div class="stage2">
+  <div class="stage"><button class="playbtn" id="play">⏸ pause</button><canvas id="sea"></canvas><div class="stage-cap" id="cap">—</div></div>
+  <div class="mini"><canvas id="chart"></canvas></div>
+ </div>
+ <div class="row">
+  <div class="card controls"><h4>Controls</h4><div class="ctrls3">
+   <div class="ctrl"><div class="ctrl-top"><label>T</label><span class="val"><span id="Tv">10.0</span> s</span></div><input type="range" id="T" min="3" max="16" step="0.1" value="10"></div>
+   <div class="ctrl"><div class="ctrl-top"><label>H₀</label><span class="val"><span id="Hv">2.0</span> m</span></div><input type="range" id="H" min="0.3" max="5" step="0.1" value="2"></div>
+   <div class="ctrl"><div class="ctrl-top"><label>probe depth d</label><span class="val"><span id="dv">10.0</span> m</span></div><input type="range" id="d" min="0.5" max="60" step="0.1" value="10"></div>
+  </div>
+  <div class="btns"><button class="btn" id="ex1">Example 1 (T=10 s, H₀=2 m, d=10 m)</button></div>
+  <p class="note">Beach slope in the sketch is 1:50 from 60 m depth. Orange marker = probe depth; the dashed line is the breaking limit H = 0.78 d.</p></div>
+  <div class="card readout"><h4>At the probe depth</h4><div class="grid2">
+   <div class="stat"><div class="k">L / L₀</div><div class="v"><span id="oL">—</span> <small>m</small></div></div>
+   <div class="stat"><div class="k">n = Cg/C</div><div class="v"><span id="on">—</span></div></div>
+   <div class="stat"><div class="k">K_s = √(Cg₀/Cg)</div><div class="v"><span id="oKs">—</span></div></div>
+   <div class="stat"><div class="k">H = K_s H₀</div><div class="v"><span id="oH">—</span> <small>m</small></div></div>
+  </div><div class="badge"><span class="dot"></span><span id="oReg">—</span></div></div>
+ </div>
+ <div class="subst">P = E·C·n = const → ⅛ρgH₀²·C₀n₀ = ⅛ρgH²·Cn → H/H₀ = √(C₀/(2nC)) = K<sub>s</sub> = <b><span id="sKs">—</span></b></div>
+</div>
+</div>
+<script>
+const g=9.81,rho=1025;
+function solveK(sig,d){let k=sig*sig/g;if(d<=0)return NaN;for(let i=0;i<200;i++){const tk=Math.tanh(k*d);const f=g*k*tk-sig*sig;const df=g*tk+g*k*d*(1-tk*tk);let kn=k-f/df;if(!isFinite(kn)||kn<=0)kn=sig*sig/(g*Math.max(tk,1e-9));if(Math.abs(kn-k)<1e-12){k=kn;break;}k=kn;}return k;}
+function waveProps(T,d){const sig=2*Math.PI/T,k=solveK(sig,d),L=2*Math.PI/k,C=sig/k,kd=k*d;let n;if(2*kd>700)n=0.5;else n=0.5*(1+2*kd/Math.sinh(2*kd));const Cg=n*C,dL=d/L;let reg='Intermediate water';if(dL>=0.5)reg='Deep water';else if(dL<=0.05)reg='Shallow water';return{sig,k,L,C,Cg,n,kd,dL,reg};}
+function deep(T){const L0=g*T*T/(2*Math.PI),C0=L0/T;return{L0,C0,Cg0:C0/2};}
+function Ks(T,d){const p=waveProps(T,d),q=deep(T);return Math.sqrt(q.Cg0/p.Cg);}
+const fx=(x,d)=>(isFinite(x)?x.toFixed(d):'—');
+function setFill(el){if(!el)return;const mn=+el.min,mx=+el.max,v=+el.value;el.style.setProperty('--fill',((v-mn)/(mx-mn)*100)+'%');}
+function fitCanvas(cv){const dpr=Math.min(window.devicePixelRatio||1,2);const w=cv.clientWidth,h=cv.clientHeight;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return[c,w,h];}
+const REDUCE=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+const $=id=>document.getElementById(id);
+const S=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+function bindRange(id,disp,dec,cb){const el=$(id);setFill(el);el.addEventListener('input',()=>{S(disp,(+el.value).toFixed(dec));setFill(el);cb(+el.value);});}
+function setRange(id,disp,dec,v){const el=$(id);el.value=v;setFill(el);S(disp,(+v).toFixed(dec));}
+function makePlayer(draw){let start=performance.now(),frozen=0,playing=!REDUCE;const b=$('play');
+ if(b){b.textContent=playing?'⏸ pause':'▶ play';b.addEventListener('click',()=>{playing=!playing;if(playing){start=performance.now();b.textContent='⏸ pause';}else{frozen+=performance.now()-start;b.textContent='▶ play';}});}
+ function loop(now){draw(playing?now-start+frozen:frozen);requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+// small chart helper for the light 'mini' panels
+function axes(c,w,h,o){const m={l:46,r:12,t:14,b:34},W=w-m.l-m.r,H=h-m.t-m.b;
+ const X=v=>m.l+(o.logx?(Math.log10(v)-Math.log10(o.x0))/(Math.log10(o.x1)-Math.log10(o.x0)):(v-o.x0)/(o.x1-o.x0))*W;
+ const Y=v=>m.t+(1-(v-o.y0)/(o.y1-o.y0))*H;
+ c.clearRect(0,0,w,h);c.fillStyle='#fff';c.fillRect(0,0,w,h);c.font='10.5px "IBM Plex Mono",monospace';c.lineWidth=1;
+ c.strokeStyle='#E3ECED';c.fillStyle='#5A6B72';
+ (o.xt||[]).forEach(t=>{const x=X(t);c.beginPath();c.moveTo(x,m.t);c.lineTo(x,m.t+H);c.stroke();c.textAlign='center';c.fillText(o.xf?o.xf(t):t,x,m.t+H+14);});
+ (o.yt||[]).forEach(t=>{const y=Y(t);c.beginPath();c.moveTo(m.l,y);c.lineTo(m.l+W,y);c.stroke();c.textAlign='right';c.fillText(o.yf?o.yf(t):t,m.l-6,y+3);});
+ c.strokeStyle='#9FB2B6';c.beginPath();c.moveTo(m.l,m.t);c.lineTo(m.l,m.t+H);c.lineTo(m.l+W,m.t+H);c.stroke();
+ c.fillStyle='#0F4152';c.textAlign='center';c.fillText(o.xl||'',m.l+W/2,h-6);
+ c.save();c.translate(11,m.t+H/2);c.rotate(-Math.PI/2);c.fillText(o.yl||'',0,0);c.restore();c.textAlign='left';
+ return{X,Y,m,W,H};}
+
+
+const st={T:10,H:2,d:10};const sea=$('sea'),ch=$('chart');let c1,w1,h1,c2,w2,h2;
+const DMAX=60,SLOPE=1/50;
+function sz(){[c1,w1,h1]=fitCanvas(sea);[c2,w2,h2]=fitCanvas(ch);drawChart();}
+function readout(){const p=waveProps(st.T,st.d),q=deep(st.T),ks=Math.sqrt(q.Cg0/p.Cg),H=ks*st.H;
+ S('oL',fx(p.L,1)+' / '+fx(q.L0,0));S('on',fx(p.n,3));S('oKs',fx(ks,3));S('sKs',fx(ks,3));
+ const brk=H>0.78*st.d;$('oH').innerHTML=fx(H,2)+(brk?' <span class="warn" style="font-size:12px">breaks</span>':'');S('oReg',p.reg+' · d/L = '+fx(p.dL,3));drawChart();}
+function drawChart(){if(!c2)return;const q=deep(st.T);
+ const A=axes(c2,w2,h2,{logx:true,x0:0.005,x1:1,y0:0.85,y1:1.6,xt:[0.01,0.05,0.1,0.5,1],yt:[0.9,1,1.1,1.2,1.3,1.4,1.5],xl:'d / L₀ (log)',yl:'K_s = H / H₀'});
+ c2.fillStyle='rgba(67,208,199,0.10)';c2.fillRect(A.X(0.005),A.m.t,A.X(0.05)-A.X(0.005),A.H);
+ c2.strokeStyle='#0F4152';c2.lineWidth=2;c2.beginPath();let first=true,minv=9,minx=0;
+ for(let i=0;i<=300;i++){const r=0.005*Math.pow(200,i/300),d=r*q.L0,ks=Ks(st.T,d);if(ks<minv){minv=ks;minx=r;}const x=A.X(r),y=A.Y(Math.min(ks,1.6));if(first){c2.moveTo(x,y);first=false;}else c2.lineTo(x,y);}c2.stroke();
+ c2.setLineDash([4,4]);c2.strokeStyle='#9FB2B6';c2.beginPath();c2.moveTo(A.X(0.005),A.Y(1));c2.lineTo(A.X(1),A.Y(1));c2.stroke();c2.setLineDash([]);
+ c2.fillStyle='#5A6B72';c2.fillText('min K_s = '+minv.toFixed(3)+' at d/L₀ ≈ '+minx.toFixed(2),A.X(0.012),A.m.t+12);
+ const r=st.d/q.L0;if(r>=0.005&&r<=1){const x=A.X(r),y=A.Y(Math.min(Ks(st.T,st.d),1.6));c2.fillStyle='#F2A93B';c2.beginPath();c2.arc(x,y,6,0,2*Math.PI);c2.fill();c2.strokeStyle='#fff';c2.lineWidth=2;c2.stroke();}}
+function draw(time){const t=time/1000,{T,H}=st,q=deep(T);c1.clearRect(0,0,w1,h1);c1.fillStyle='#0A2A3A';c1.fillRect(0,0,w1,h1);
+ const Xlen=DMAX/SLOPE, xs=w1/Xlen, swlY=0.36*h1, zs=(h1*0.56)/DMAX;
+ const depth=x=>Math.max(DMAX-x*SLOPE,0); // x from offshore (left) to shore (right)
+ // exaggeration of wave height
+ const E=Math.max(1,Math.min(6,(0.11*h1)/(H*zs)));S('cap','vertical scale: depth ×1, wave height ×'+E.toFixed(1)+' · slope 1:50');
+ // precompute phase by integrating k dx
+ const N=Math.ceil(w1/2);let ph=0,pts=[],brkX=null;
+ for(let i=0;i<=N;i++){const x=i*2/xs,d=depth(x);if(d<0.3){break;}const p=waveProps(T,d),ks=Math.sqrt(q.Cg0/p.Cg);let Hl=ks*H;if(Hl>0.78*d){if(brkX===null)brkX=x;}
+  if(i>0)ph+=p.k*(2/xs);pts.push([i*2,ph,Hl,d]);}
+ const sig=2*Math.PI/T;const gr=c1.createLinearGradient(0,swlY,0,swlY+DMAX*zs);gr.addColorStop(0,'#12556A');gr.addColorStop(1,'#0B2E3D');
+ c1.beginPath();c1.moveTo(0,swlY+DMAX*zs);
+ pts.forEach(([px,phi,Hl,d])=>{const x=px/xs;const amp=(brkX!==null&&x>brkX)?0.39*d:Hl/2;c1.lineTo(px,swlY-E*amp*Math.cos(phi-sig*t)*zs);});
+ const lastPx=pts.length?pts[pts.length-1][0]:w1;c1.lineTo(lastPx,swlY);c1.lineTo(w1,swlY);c1.lineTo(w1,swlY+DMAX*zs);c1.closePath();c1.fillStyle=gr;c1.fill();
+ c1.beginPath();pts.forEach(([px,phi,Hl,d],i)=>{const x=px/xs;const amp=(brkX!==null&&x>brkX)?0.39*d:Hl/2;const y=swlY-E*amp*Math.cos(phi-sig*t)*zs;if(i===0)c1.moveTo(px,y);else c1.lineTo(px,y);});
+ c1.strokeStyle='#5FE6DC';c1.lineWidth=2.2;c1.stroke();
+ // envelope H/2 (exaggerated)
+ c1.setLineDash([3,4]);c1.strokeStyle='rgba(242,169,59,0.6)';c1.lineWidth=1;c1.beginPath();pts.forEach(([px,phi,Hl],i)=>{const y=swlY-E*Hl/2*zs;if(i===0)c1.moveTo(px,y);else c1.lineTo(px,y);});c1.stroke();
+ c1.strokeStyle='rgba(232,102,60,0.55)';c1.beginPath();pts.forEach(([px,phi,Hl,d],i)=>{const y=swlY-E*0.39*d*zs;if(i===0)c1.moveTo(px,y);else c1.lineTo(px,y);});c1.stroke();c1.setLineDash([]);
+ // SWL & bed
+ c1.setLineDash([5,6]);c1.strokeStyle='rgba(234,240,241,0.35)';c1.beginPath();c1.moveTo(0,swlY);c1.lineTo(w1,swlY);c1.stroke();c1.setLineDash([]);
+ c1.fillStyle='#C9A66B';c1.beginPath();c1.moveTo(0,swlY+DMAX*zs);c1.lineTo(w1,swlY);c1.lineTo(w1,h1);c1.lineTo(0,h1);c1.closePath();c1.fill();
+ c1.font='11px "IBM Plex Mono",monospace';c1.fillStyle='rgba(234,240,241,0.6)';c1.fillText('SWL',6,swlY-6);
+ // probe
+ const xp=(DMAX-st.d)/SLOPE*xs;c1.strokeStyle='#F2A93B';c1.lineWidth=1.5;c1.beginPath();c1.moveTo(xp,swlY-0.2*h1);c1.lineTo(xp,swlY+st.d*zs);c1.stroke();
+ c1.fillStyle='#F2A93B';c1.fillText('d = '+st.d.toFixed(1)+' m',Math.min(xp+5,w1-80),swlY-0.2*h1+10);
+ if(brkX!==null){const xb=brkX*xs;c1.fillStyle='#E8663C';c1.fillText('breaking (H = 0.78d) at d ≈ '+depth(brkX).toFixed(1)+' m',Math.max(6,Math.min(xb-120,w1-260)),swlY+DMAX*zs*0.15+40);}
+ c1.fillStyle='rgba(234,240,241,0.6)';c1.fillText('offshore  d = 60 m',6,h1-10);c1.textAlign='right';c1.fillText('shore',w1-6,h1-10);c1.textAlign='left';}
+window.addEventListener('resize',sz);
+window.addEventListener('load',()=>{sz();
+ bindRange('T','Tv',1,v=>{st.T=v;readout();});bindRange('H','Hv',1,v=>{st.H=v;readout();});bindRange('d','dv',1,v=>{st.d=v;readout();});
+ $('ex1').addEventListener('click',()=>{st.T=10;st.H=2;st.d=10;setRange('T','Tv',1,10);setRange('H','Hv',1,2);setRange('d','dv',1,10);readout();});
+ readout();makePlayer(draw);});
+
+</script></body></html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wave runup on a slope · ACEE348</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--paper:#F3F8F8;--ink:#0C232E;--muted:#5A6B72;--deep:#0A2A3A;--deep2:#0F4152;
+--foam:#43D0C7;--buoy:#F2A93B;--sand:#C9A66B;--coral:#E8663C;--line:#CBD8DA;--card:#FFFFFF;}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Inter",system-ui,sans-serif;font-size:16px;-webkit-font-smoothing:antialiased}
+.page{height:100%;display:flex;flex-direction:column;padding:14px 16px;gap:10px;overflow:hidden}
+.cap{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);flex:0 0 auto;display:flex;align-items:center;gap:8px}
+.cap b{color:var(--deep2)}.cap .dotc{width:7px;height:7px;border-radius:50%;background:var(--coral);display:inline-block}
+.area{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px}
+.stage{flex:1 1 auto;min-height:0;background:var(--deep);border-radius:14px;overflow:hidden;position:relative;box-shadow:0 14px 34px -24px rgba(10,42,58,.6)}
+canvas{display:block;width:100%;height:100%}
+.stage-cap{position:absolute;left:12px;bottom:9px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(234,240,241,.55);pointer-events:none}
+.playbtn{position:absolute;top:10px;right:10px;z-index:3;border:0;cursor:pointer;background:rgba(234,240,241,.14);color:#EAF0F1;font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 11px;border-radius:8px;backdrop-filter:blur(4px)}
+.playbtn:hover{background:rgba(234,240,241,.24)}
+.row{display:flex;gap:12px;flex-wrap:wrap;flex:0 0 auto}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.controls{flex:1 1 320px}.readout{flex:1 1 300px}
+h4{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;font-weight:600}
+.ctrls3{display:flex;gap:16px;flex-wrap:wrap}
+.ctrl{flex:1 1 150px;min-width:130px}
+.ctrl-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.ctrl-top label{font-weight:600;font-size:14px}
+.ctrl-top .val{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--deep2);font-size:14px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:4px;background:linear-gradient(90deg,var(--foam) 0%,var(--foam) var(--fill,50%),#DBE4E5 var(--fill,50%));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:19px;height:19px;border-radius:50%;background:var(--card);border:3px solid var(--buoy);cursor:pointer;box-shadow:0 2px 6px rgba(12,35,46,.25)}
+input[type=range]::-moz-range-thumb{width:19px;height:19px;border-radius:50%;background:var(--card);border:3px solid var(--buoy);cursor:pointer}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px 16px}
+.stat{border-left:2px solid var(--line);padding-left:11px}
+.stat .k{font-size:11px;color:var(--muted);font-family:"IBM Plex Mono",monospace}
+.stat .v{font-family:"IBM Plex Mono",monospace;font-size:20px;font-weight:600;line-height:1.15}
+.stat .v small{font-size:12px;color:var(--muted);font-weight:400}
+.badge{margin-top:12px;display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13px;padding:6px 13px;border-radius:20px;background:#EAF6F5;color:var(--deep2);font-family:"IBM Plex Mono",monospace}
+.badge .dot{width:9px;height:9px;border-radius:50%;background:var(--buoy)}
+.subst{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--deep2);background:#EDF5F5;border:1px dashed var(--line);border-radius:10px;padding:9px 12px;text-align:center;line-height:1.8;flex:0 0 auto}
+.subst b{color:var(--buoy)}
+.note{font-size:13px;color:var(--muted);margin:6px 0 0}
+.spectrum{display:flex;border-radius:12px;overflow:hidden;border:1px solid var(--line);flex:0 0 auto}
+.band{flex:1;padding:16px 9px;cursor:pointer;text-align:center;border-right:1px solid rgba(255,255,255,.5);transition:flex .25s,background .2s;color:#fff;min-width:0}
+.band:last-child{border-right:0}.band .bt{font-family:"Space Grotesk",sans-serif;font-weight:600;font-size:14px}
+.band .bp{font-family:"IBM Plex Mono",monospace;font-size:11px;opacity:.85;margin-top:3px}
+.band.active{flex:2.4}
+.band-detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;font-size:15px;flex:1 1 auto;min-height:0;overflow:auto}
+.scalebar{position:relative;height:58px;margin:32px 8px 10px}
+.scalebar .track{position:absolute;top:26px;left:0;right:0;height:8px;border-radius:5px;background:linear-gradient(90deg,#8FD0C9,#2E9BB0,#0F4152)}
+.tick{position:absolute;top:16px;width:1px;height:28px;background:var(--muted)}
+.tick .lab{position:absolute;top:30px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--muted)}
+.zone{position:absolute;top:-16px;font-size:12px;font-weight:600;color:var(--muted);transform:translateX(-50%);font-family:"Space Grotesk",sans-serif}
+.ptr{position:absolute;top:8px;transform:translateX(-50%);transition:left .12s ease}
+.ptr .pin{width:2px;height:44px;background:var(--buoy);margin:0 auto}
+.ptr .cap2{position:absolute;top:-18px;left:50%;transform:translateX(-50%);white-space:nowrap;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;color:var(--buoy)}
+.exgrid{display:flex;gap:14px;flex:1 1 auto;min-height:0}
+.excard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;flex:1;display:flex;flex-direction:column}
+.excard .tag{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--coral);font-weight:600}
+.exout{margin-top:10px;font-family:"IBM Plex Mono",monospace;font-size:12.5px;line-height:1.9;color:var(--deep2)}
+.exout b{color:var(--buoy)}.exout .reg{color:var(--coral);font-weight:600}
+.ebar{display:flex;height:34px;border-radius:8px;overflow:hidden;margin:10px 0 4px;border:1px solid var(--line)}
+.ebar .ep{background:#7FC9C2}.ebar .ek{background:#3E9BB0}
+.ebar div{display:flex;align-items:center;justify-content:center;color:#04222b;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-family:"IBM Plex Mono",monospace;font-size:12px}
+.legend span{display:inline-flex;align-items:center;gap:6px}.legend .sw{width:14px;height:3px;border-radius:2px;display:inline-block}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{border:1px solid var(--line);background:#EDF5F5;color:var(--deep2);font-family:"IBM Plex Mono",monospace;font-size:12px;
+ padding:6px 11px;border-radius:8px;cursor:pointer}
+.btn:hover{background:#DFF0EF}.btn.on{background:var(--deep2);color:#fff;border-color:var(--deep2)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.seg button{border:0;background:#fff;font-family:"IBM Plex Mono",monospace;font-size:12px;padding:6px 11px;cursor:pointer;color:var(--deep2)}
+.seg button.on{background:var(--deep2);color:#fff}
+.stage2{display:flex;gap:10px;flex:1 1 auto;min-height:0}
+.stage2 .stage{flex:1 1 0}
+.mini{flex:0 0 34%;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative}
+.mini canvas{display:block;width:100%;height:100%}
+.legend2{position:absolute;right:10px;bottom:9px;font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:rgba(234,240,241,.75);display:flex;align-items:center;gap:6px;pointer-events:none}
+.legend2 .bar{width:110px;height:8px;border-radius:4px}
+.warn{color:var(--coral);font-weight:600}
+@media (max-width:760px){.stage2{flex-direction:column}.mini{flex:0 0 220px}.page{overflow:auto;height:auto}html,body{height:auto}.stage{min-height:300px}}
+</style></head><body><div class="page">
+<div class="cap"><span class="dotc"></span>ACEE348 Ch.4 · <b>Runup — maximum vertical elevation of the swash above SWL on a sloped shore or structure</b></div>
+
+<div class="area">
+ <div class="stage2">
+  <div class="stage"><button class="playbtn" id="play">⏸ pause</button><canvas id="sea"></canvas><div class="stage-cap" id="cap">—</div></div>
+  <div class="mini"><canvas id="chart"></canvas></div>
+ </div>
+ <div class="row">
+  <div class="card controls"><h4>Controls</h4><div class="ctrls3">
+   <div class="ctrl"><div class="ctrl-top"><label>H₀′</label><span class="val"><span id="Hv">2.0</span> m</span></div><input type="range" id="H" min="0.3" max="5" step="0.1" value="2"></div>
+   <div class="ctrl"><div class="ctrl-top"><label>T</label><span class="val"><span id="Tv">10.0</span> s</span></div><input type="range" id="T" min="3" max="16" step="0.1" value="10"></div>
+   <div class="ctrl"><div class="ctrl-top"><label>slope cot α</label><span class="val"><span id="mv">10</span></span></div><input type="range" id="m" min="1.5" max="30" step="0.5" value="10"></div>
+   <div class="ctrl"><div class="ctrl-top"><label>roughness r</label><span class="val"><span id="rv">1.00</span></span></div><input type="range" id="r" min="0.4" max="1" step="0.005" value="1"></div>
+  </div>
+  <div class="btns"><span class="note" style="margin:0 4px 0 0;align-self:center">r:</span><button class="btn" data-r="1">smooth, impermeable 1.0</button><button class="btn" data-r="0.875">grass 0.85–0.90</button><button class="btn" data-r="0.55">rough rubble ≈ 0.5–0.6</button>
+   <button class="btn" id="ex4">Example 4 (H₀′=2 m, T=10 s, 1:10 grass)</button></div>
+  <p class="note">Smooth-slope runup from Hunt (1959): R/H₀′ = ξ₀ for breaking waves, capped by the non-breaking limit √(π/2α). The textbook chart (Fig. 3) adds the effect of the toe depth d<sub>s</sub>/H₀′; check final answers against it and Table 2.1 for r.</p></div>
+  <div class="card readout"><h4>Runup</h4><div class="grid2">
+   <div class="stat"><div class="k">H₀′/gT² · H₀′/L₀</div><div class="v"><span id="os">—</span></div></div>
+   <div class="stat"><div class="k">ξ₀ = tan α/√(H₀′/L₀)</div><div class="v"><span id="oxi">—</span></div></div>
+   <div class="stat"><div class="k">R smooth (R/H₀′)</div><div class="v"><span id="oRs">—</span></div></div>
+   <div class="stat"><div class="k">R rough = r·R</div><div class="v"><span id="oR">—</span> <small>m</small></div></div>
+  </div><div class="badge"><span class="dot"></span><span id="otype">—</span></div></div>
+ </div>
+</div>
+</div>
+<script>
+const g=9.81,rho=1025;
+function solveK(sig,d){let k=sig*sig/g;if(d<=0)return NaN;for(let i=0;i<200;i++){const tk=Math.tanh(k*d);const f=g*k*tk-sig*sig;const df=g*tk+g*k*d*(1-tk*tk);let kn=k-f/df;if(!isFinite(kn)||kn<=0)kn=sig*sig/(g*Math.max(tk,1e-9));if(Math.abs(kn-k)<1e-12){k=kn;break;}k=kn;}return k;}
+function waveProps(T,d){const sig=2*Math.PI/T,k=solveK(sig,d),L=2*Math.PI/k,C=sig/k,kd=k*d;let n;if(2*kd>700)n=0.5;else n=0.5*(1+2*kd/Math.sinh(2*kd));const Cg=n*C,dL=d/L;let reg='Intermediate water';if(dL>=0.5)reg='Deep water';else if(dL<=0.05)reg='Shallow water';return{sig,k,L,C,Cg,n,kd,dL,reg};}
+function deep(T){const L0=g*T*T/(2*Math.PI),C0=L0/T;return{L0,C0,Cg0:C0/2};}
+function Ks(T,d){const p=waveProps(T,d),q=deep(T);return Math.sqrt(q.Cg0/p.Cg);}
+const fx=(x,d)=>(isFinite(x)?x.toFixed(d):'—');
+function setFill(el){if(!el)return;const mn=+el.min,mx=+el.max,v=+el.value;el.style.setProperty('--fill',((v-mn)/(mx-mn)*100)+'%');}
+function fitCanvas(cv){const dpr=Math.min(window.devicePixelRatio||1,2);const w=cv.clientWidth,h=cv.clientHeight;cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);const c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return[c,w,h];}
+const REDUCE=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+const $=id=>document.getElementById(id);
+const S=(id,v)=>{const e=$(id);if(e)e.textContent=v;};
+function bindRange(id,disp,dec,cb){const el=$(id);setFill(el);el.addEventListener('input',()=>{S(disp,(+el.value).toFixed(dec));setFill(el);cb(+el.value);});}
+function setRange(id,disp,dec,v){const el=$(id);el.value=v;setFill(el);S(disp,(+v).toFixed(dec));}
+function makePlayer(draw){let start=performance.now(),frozen=0,playing=!REDUCE;const b=$('play');
+ if(b){b.textContent=playing?'⏸ pause':'▶ play';b.addEventListener('click',()=>{playing=!playing;if(playing){start=performance.now();b.textContent='⏸ pause';}else{frozen+=performance.now()-start;b.textContent='▶ play';}});}
+ function loop(now){draw(playing?now-start+frozen:frozen);requestAnimationFrame(loop);}requestAnimationFrame(loop);}
+// small chart helper for the light 'mini' panels
+function axes(c,w,h,o){const m={l:46,r:12,t:14,b:34},W=w-m.l-m.r,H=h-m.t-m.b;
+ const X=v=>m.l+(o.logx?(Math.log10(v)-Math.log10(o.x0))/(Math.log10(o.x1)-Math.log10(o.x0)):(v-o.x0)/(o.x1-o.x0))*W;
+ const Y=v=>m.t+(1-(v-o.y0)/(o.y1-o.y0))*H;
+ c.clearRect(0,0,w,h);c.fillStyle='#fff';c.fillRect(0,0,w,h);c.font='10.5px "IBM Plex Mono",monospace';c.lineWidth=1;
+ c.strokeStyle='#E3ECED';c.fillStyle='#5A6B72';
+ (o.xt||[]).forEach(t=>{const x=X(t);c.beginPath();c.moveTo(x,m.t);c.lineTo(x,m.t+H);c.stroke();c.textAlign='center';c.fillText(o.xf?o.xf(t):t,x,m.t+H+14);});
+ (o.yt||[]).forEach(t=>{const y=Y(t);c.beginPath();c.moveTo(m.l,y);c.lineTo(m.l+W,y);c.stroke();c.textAlign='right';c.fillText(o.yf?o.yf(t):t,m.l-6,y+3);});
+ c.strokeStyle='#9FB2B6';c.beginPath();c.moveTo(m.l,m.t);c.lineTo(m.l,m.t+H);c.lineTo(m.l+W,m.t+H);c.stroke();
+ c.fillStyle='#0F4152';c.textAlign='center';c.fillText(o.xl||'',m.l+W/2,h-6);
+ c.save();c.translate(11,m.t+H/2);c.rotate(-Math.PI/2);c.fillText(o.yl||'',0,0);c.restore();c.textAlign='left';
+ return{X,Y,m,W,H};}
+
+
+const st={H:2,T:10,m:10,r:1};const sea=$('sea'),ch=$('chart');let c1,w1,h1,c2,w2,h2;
+function calc(){const q=deep(st.T),s=st.H/q.L0,ta=1/st.m,al=Math.atan(ta),xi=ta/Math.sqrt(s),cap=Math.sqrt(Math.PI/(2*al));const RH=Math.min(xi,cap);return{q,s,ta,al,xi,cap,RH,Rs:RH*st.H,R:RH*st.H*st.r,brk:xi<cap};}
+function readout(){const c=calc();S('os',fx(st.H/(g*st.T*st.T),4)+' · '+fx(c.s,4));S('oxi',fx(c.xi,2));S('oRs',fx(c.Rs,2)+' m ('+fx(c.RH,2)+')');S('oR',fx(c.R,2));
+ S('otype',(c.xi<0.5?'spilling':c.xi<3.3?'plunging':'surging')+' · '+(c.brk?'breaking-wave runup':'non-breaking (reflective) limit'));drawChart();}
+function drawChart(){if(!c2)return;const c=calc();const A=axes(c2,w2,h2,{x0:0,x1:5,y0:0,y1:4,xt:[0,1,2,3,4,5],yt:[0,1,2,3,4],xl:'ξ₀ = tan α / √(H₀′/L₀)',yl:'R / H₀′ (smooth)'});
+ c2.strokeStyle='#0F4152';c2.lineWidth=2;c2.beginPath();c2.moveTo(A.X(0),A.Y(0));c2.lineTo(A.X(Math.min(c.cap,4)),A.Y(Math.min(c.cap,4)));c2.lineTo(A.X(5),A.Y(Math.min(c.cap,4)));c2.stroke();
+ c2.strokeStyle='#43D0C7';c2.setLineDash([4,4]);c2.beginPath();c2.moveTo(A.X(0),A.Y(0));c2.lineTo(A.X(5),A.Y(5*st.r));c2.stroke();c2.setLineDash([]);
+ c2.fillStyle='#5A6B72';c2.fillText('cap √(π/2α) for this slope = '+c.cap.toFixed(2),A.m.l+8,A.m.t+12);c2.fillStyle='#43D0C7';c2.fillText('rough: r·ξ₀',A.X(3.3),A.Y(Math.min(3.6,3.3*st.r))-6);
+ [['spilling',0,0.5],['plunging',0.5,3.3],['surging',3.3,5]].forEach(([n,a,b],i)=>{c2.fillStyle=['rgba(67,208,199,0.08)','rgba(242,169,59,0.08)','rgba(232,102,60,0.08)'][i];c2.fillRect(A.X(a),A.m.t,A.X(b)-A.X(a),A.H);c2.fillStyle='#5A6B72';c2.fillText(n,A.X((a+b)/2)-18,A.m.t+A.H-6);});
+ const x=A.X(Math.min(c.xi,5)),y=A.Y(Math.min(c.RH,4));c2.fillStyle='#F2A93B';c2.beginPath();c2.arc(x,y,6,0,2*Math.PI);c2.fill();c2.strokeStyle='#fff';c2.lineWidth=2;c2.stroke();}
+function sz(){[c1,w1,h1]=fitCanvas(sea);[c2,w2,h2]=fitCanvas(ch);readout();}
+function draw(time){const t=time/1000,c=calc();c1.clearRect(0,0,w1,h1);c1.fillStyle='#0A2A3A';c1.fillRect(0,0,w1,h1);
+ const R=c.R,ds=4; // toe depth for the sketch
+ const zTop=Math.max(R*1.6,st.H*1.2,2),zBot=-ds-1;const zs=(h1*0.8)/(zTop-zBot),swlY=0.1*h1+zTop*zs;
+ const xToe=w1*0.30;const xs=Math.min(zs,(w1-xToe-50)/((Math.max(R,0.5)*1.25+ds)*st.m)); // compress horizontally so the slope fits
+ const slopeX=z=>xToe+(z+ds)*st.m*xs/ (1); // horizontal position of slope surface at elevation z
+ const xsMax=w1;const xView=(xsMax-xToe)/xs; S('cap','horizontal scale compressed ×'+(zs/xs).toFixed(1)+' · toe depth '+ds+' m · slope 1:'+st.m);
+ // swash: water line elevation oscillates between -0.3R and R
+ const ph=(t/st.T)%1;const sw=ph<0.45?Math.sin(ph/0.45*Math.PI/2):Math.cos((ph-0.45)/0.55*Math.PI/2);const zw=-0.25*R+1.25*R*Math.pow(Math.max(sw,0),1.3);
+ // sea
+ c1.fillStyle='#12556A';c1.beginPath();c1.moveTo(0,swlY);const sig=2*Math.PI/st.T;const kk=waveProps(st.T,ds).k;
+ for(let px=0;px<=Math.min(slopeX(zw),w1);px+=3){const x=(px-xToe)/xs;let e=0.5*Math.min(st.H,0.78*ds)*Math.cos(kk*x-sig*t)*(px<xToe?1:Math.max(0,1-(px-xToe)/(slopeX(zw)-xToe+1e-6)));let y=swlY-e*zs;if(px>xToe){const yl=swlY-zw*zs;const u=(px-xToe)/(slopeX(zw)-xToe+1e-6);y=y*(1-u)+yl*u;}c1.lineTo(px,y);}
+ c1.lineTo(slopeX(zw),swlY-zw*zs);c1.lineTo(slopeX(zBot),h1);c1.lineTo(0,h1);c1.closePath();c1.fill();
+ // structure / beach
+ c1.fillStyle=st.r>0.95?'#B8A27A':st.r>0.8?'#7FA05A':'#8A8A80';c1.beginPath();c1.moveTo(0,swlY+ds*zs);c1.lineTo(xToe,swlY+ds*zs);c1.lineTo(slopeX(zTop+5),swlY-(zTop+5)*zs);c1.lineTo(w1,0);c1.lineTo(w1,h1);c1.lineTo(0,h1);c1.closePath();c1.fill();
+ if(st.r<0.8){c1.fillStyle='rgba(0,0,0,0.18)';for(let z=-ds;z<zTop;z+=0.6){const x=slopeX(z);c1.beginPath();c1.arc(x+4,swlY-z*zs+3,4,0,7);c1.fill();}}
+ // SWL and runup marks
+ c1.setLineDash([5,6]);c1.strokeStyle='rgba(234,240,241,0.45)';c1.lineWidth=1;c1.beginPath();c1.moveTo(0,swlY);c1.lineTo(slopeX(0)+20,swlY);c1.stroke();
+ c1.strokeStyle='#F2A93B';c1.beginPath();c1.moveTo(slopeX(R)-40,swlY-R*zs);c1.lineTo(w1,swlY-R*zs);c1.stroke();c1.setLineDash([]);
+ c1.strokeStyle='#F2A93B';c1.lineWidth=1.5;const xa=w1-40;c1.beginPath();c1.moveTo(xa,swlY);c1.lineTo(xa,swlY-R*zs);c1.stroke();
+ c1.font='11px "IBM Plex Mono",monospace';c1.fillStyle='#F2A93B';c1.fillText('R = '+R.toFixed(2)+' m',xa-80,swlY-R*zs-6);
+ c1.fillStyle='rgba(234,240,241,0.7)';c1.fillText('SWL',6,swlY-6);c1.fillText('toe d_s = '+ds+' m',6,swlY+ds*zs-6);
+ c1.beginPath();c1.arc(slopeX(zw),swlY-zw*zs,4,0,7);c1.fillStyle='#5FE6DC';c1.fill();}
+window.addEventListener('resize',sz);
+window.addEventListener('load',()=>{sz();
+ bindRange('H','Hv',1,v=>{st.H=v;readout();});bindRange('T','Tv',1,v=>{st.T=v;readout();});bindRange('m','mv',1,v=>{st.m=v;readout();});bindRange('r','rv',2,v=>{st.r=v;readout();});
+ document.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{st.r=+b.dataset.r;setRange('r','rv',2,st.r);readout();}));
+ $('ex4').addEventListener('click',()=>{Object.assign(st,{H:2,T:10,m:10,r:0.875});setRange('H','Hv',1,2);setRange('T','Tv',1,10);setRange('m','mv',1,10);setRange('r','rv',2,0.875);readout();});
+ makePlayer(draw);});
+
+</script></body></html>
